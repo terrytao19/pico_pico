@@ -6,6 +6,7 @@
 #![no_std]
 #![no_main]
 
+mod anim;
 mod battery;
 mod draw;
 mod imu;
@@ -25,6 +26,9 @@ use embassy_time::Delay;
 use gc9a01::prelude::*;
 use static_cell::StaticCell;
 use {defmt_rtt as _, panic_probe as _};
+
+/// Display is a 240 px square (round) panel.
+pub const SCREEN: i32 = 240;
 
 static mut CORE1_STACK: Stack<4096> = Stack::new();
 static EXECUTOR0: StaticCell<Executor> = StaticCell::new();
@@ -115,9 +119,11 @@ fn main() -> ! {
         },
     );
 
+    // Core 0: sensors + the animation brain. Core 1 just renders.
     let executor0 = EXECUTOR0.init(Executor::new());
     executor0.run(|spawner| {
         unwrap!(spawner.spawn(imu::imu_task(i2c)));
         unwrap!(spawner.spawn(battery::battery_task(bat_adc, bat_ch)));
+        unwrap!(spawner.spawn(anim::anim_task()));
     });
 }
