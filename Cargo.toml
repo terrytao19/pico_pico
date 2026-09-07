@@ -1,5 +1,5 @@
 [package]
-name = "lcd-multicore"
+name = "pico-pico"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,7 +11,9 @@ defmt = "0.3.8"
 defmt-rtt = "0.4.1"
 embassy-embedded-hal = { version = "0.2.0", features = ["defmt"] }
 embassy-executor = { version = "0.6.0", features = [
-    "task-arena-size-98304",
+    # These tasks are tiny; the huge default arena was eating RAM the
+    # 240x240x2 framebuffer needs. See src/main.rs LCD.init_with().
+    "task-arena-size-16384",
     "arch-cortex-m",
     "executor-thread",
     "executor-interrupt",
@@ -37,12 +39,15 @@ static_cell = "2.1.0"
 
 # Graphics and screen driver.
 embedded-graphics = "0.8.1"
+tinybmp = "0.5"
 embedded-graphics-framebuf = "*"
 display-interface = "*"
 gc9a01-rs = "0.4.2"
 
 arrayvec = { version = "*", default-features = false }
 tinyrand = "*"
+
+ph-qmi8658 = "0.1"
 
 [profile.release]
 debug = 2
@@ -53,3 +58,6 @@ opt-level = 'z'
 debug = 2
 lto = true
 opt-level = "z"
+
+[build-dependencies]
+image = { version = "0.25", default-features = false, features = ["bmp"] }

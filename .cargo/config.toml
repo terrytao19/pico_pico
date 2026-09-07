@@ -1,5 +1,6 @@
 [target.'cfg(all(target_arch = "arm", target_os = "none"))']
-runner = "probe-rs run --chip RP2040 --protocol swd"
+# --speed caps the SWD clock; the default is flaky over this probe's wiring.
+runner = "probe-rs run --chip RP2040 --protocol swd --speed 4000"
 
 [build]
 target = "thumbv6m-none-eabi"        # Cortex-M0 and Cortex-M0+
